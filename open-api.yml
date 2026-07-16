@@ -1,0 +1,501 @@
+openapi: '3.0.3'
+info:
+  title: Warm House API
+  version: '1.0.0'
+  description: API для работы с девайсами и сценариями умного дома
+
+servers:
+  - url: http://localhost:8080/api
+
+tags:
+  - name: Devices
+    description: Зарегистрированные девайсы и поддерживаемые ими команды
+  - name: Telemetry
+    description: Исторические данные устройств
+  - name: Scenarios
+    description: Создание, настройка и запуск сценариев
+
+paths:
+  /devices:
+    get:
+      summary: Получить список зарегистрированных девайсов
+      operationId: getDevices
+      tags:
+        - Devices
+      responses:
+        '200':
+          description: Список девайсов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceResponse'
+    post:
+      summary: Зарегистрировать девайс
+      operationId: registerDevice
+      tags:
+        - Devices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDeviceRequest'
+      responses:
+        '201':
+          description: Девайс зарегистрирован
+          headers:
+            Location:
+              description: URL зарегистрированного девайса
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /devices/{deviceId}:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    get:
+      summary: Получить зарегистрированный девайс
+      operationId: getDevice
+      tags:
+        - Devices
+      responses:
+        '200':
+          description: Девайс и поддерживаемые им команды
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+
+  /devices/{deviceId}/commands:
+    parameters:
+      - $ref: '#/components/parameters/DeviceId'
+    post:
+      summary: Выполнить поддерживаемую устройством команду
+      operationId: executeDeviceCommand
+      tags:
+        - Devices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteDeviceCommandRequest'
+      responses:
+        '204':
+          description: Команда выполнена, телеметрия передана в сервис истории
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /telemetry:
+    get:
+      summary: Получить исторические данные
+      operationId: getTelemetry
+      tags:
+        - Telemetry
+      parameters:
+        - name: device_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Записи телеметрии
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetryResponse'
+    post:
+      summary: Сохранить телеметрию
+      operationId: createTelemetry
+      tags:
+        - Telemetry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTelemetryRequest'
+      responses:
+        '201':
+          description: Телеметрия сохранена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryResponse'
+
+  /scenarios:
+    get:
+      summary: Получить список сценариев
+      operationId: getScenarios
+      tags:
+        - Scenarios
+      responses:
+        '200':
+          description: Список сценариев
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScenarioResponse'
+    post:
+      summary: Создать сценарий
+      operationId: createScenario
+      tags:
+        - Scenarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScenarioRequest'
+      responses:
+        '201':
+          description: Сценарий создан
+          headers:
+            Location:
+              description: URL созданного сценария
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /scenarios/{scenarioId}:
+    parameters:
+      - $ref: '#/components/parameters/ScenarioId'
+    get:
+      summary: Получить сценарий
+      operationId: getScenario
+      tags:
+        - Scenarios
+      responses:
+        '200':
+          description: Сценарий
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioResponse'
+    put:
+      summary: Заменить сценарий
+      operationId: updateScenario
+      tags:
+        - Scenarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScenarioRequest'
+      responses:
+        '200':
+          description: Сценарий обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      summary: Удалить сценарий
+      operationId: deleteScenario
+      tags:
+        - Scenarios
+      responses:
+        '204':
+          description: Сценарий удалён
+
+  /scenarios/{scenarioId}/executions:
+    parameters:
+      - $ref: '#/components/parameters/ScenarioId'
+    post:
+      summary: Запустить сценарий немедленно
+      operationId: executeScenario
+      tags:
+        - Scenarios
+      responses:
+        '202':
+          description: Сценарий принят к выполнению
+          headers:
+            Location:
+              description: URL созданного запуска
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioExecutionResponse'
+
+  /scenario-executions/{executionId}:
+    parameters:
+      - $ref: '#/components/parameters/ExecutionId'
+    get:
+      summary: Получить состояние запуска сценария
+      operationId: getScenarioExecution
+      tags:
+        - Scenarios
+      responses:
+        '200':
+          description: Состояние запуска сценария
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioExecutionResponse'
+
+components:
+  parameters:
+    DeviceId:
+      name: deviceId
+      in: path
+      required: true
+      description: Идентификатор девайса
+      schema:
+        type: string
+        format: uuid
+    ScenarioId:
+      name: scenarioId
+      in: path
+      required: true
+      description: Идентификатор сценария
+      schema:
+        type: string
+        format: uuid
+    ExecutionId:
+      name: executionId
+      in: path
+      required: true
+      description: Идентификатор запуска сценария
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Некорректный запрос
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+
+  schemas:
+    RegisterDeviceRequest:
+      type: object
+      required:
+        - name
+        - type
+        - settings
+        - commands
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        settings:
+          type: object
+          description: Начальные настройки девайса
+          additionalProperties: true
+        commands:
+          type: array
+          description: Команды, поддерживаемые девайсом
+          items:
+            $ref: '#/components/schemas/CommandDefinition'
+
+    DeviceResponse:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+        - $ref: '#/components/schemas/RegisterDeviceRequest'
+
+    CommandDefinition:
+      type: object
+      required:
+        - name
+        - parameters_schema
+      properties:
+        name:
+          type: string
+          description: Машиночитаемое имя команды
+        parameters_schema:
+          type: object
+          description: JSON Schema параметров команды
+          additionalProperties: true
+
+    ExecuteDeviceCommandRequest:
+      type: object
+      required:
+        - command
+      properties:
+        command:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+
+    CreateTelemetryRequest:
+      type: object
+      required:
+        - device_id
+        - data
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        data:
+          type: object
+          additionalProperties: true
+
+    TelemetryResponse:
+      allOf:
+        - type: object
+          required:
+            - id
+            - recorded_at
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+            recorded_at:
+              type: string
+              format: date-time
+              readOnly: true
+        - $ref: '#/components/schemas/CreateTelemetryRequest'
+
+    ScenarioCommand:
+      type: object
+      required:
+        - device_id
+        - command
+        - parameters
+      properties:
+        device_id:
+          type: string
+          format: uuid
+        command:
+          type: string
+          description: Имя команды из списка команд девайса
+        parameters:
+          type: object
+          description: Параметры команды, соответствующие parameters_schema девайса
+          additionalProperties: true
+
+    CreateScenarioRequest:
+      type: object
+      required:
+        - name
+        - enabled
+        - commands
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+          description: Разрешён ли автоматический запуск по расписанию
+        scheduled_at:
+          type: string
+          format: date-time
+          description: Время однократного автоматического запуска
+        commands:
+          type: array
+          minItems: 1
+          description: Команды выполняются последовательно в порядке элементов массива
+          items:
+            $ref: '#/components/schemas/ScenarioCommand'
+
+    UpdateScenarioRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateScenarioRequest'
+
+    ScenarioResponse:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              format: uuid
+              readOnly: true
+        - $ref: '#/components/schemas/CreateScenarioRequest'
+
+    ScenarioExecutionResponse:
+      type: object
+      required:
+        - id
+        - scenario_id
+        - status
+        - started_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        scenario_id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          type: string
+          enum:
+            - pending
+            - running
+            - succeeded
+            - failed
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI, идентифицирующий тип ошибки
+        title:
+          type: string
+          description: Краткое описание типа ошибки
+        status:
+          type: integer
+          format: int32
+          description: HTTP-статус ошибки
+        detail:
+          type: string
+          description: Подробное описание конкретной ошибки
+        instance:
+          type: string
+          format: uri
+          description: URI конкретного случая ошибки

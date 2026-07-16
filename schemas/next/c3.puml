@@ -1,0 +1,27 @@
+@startuml
+title C3. Диаграмма компонентов — Сервис сценариев
+
+rectangle "Обратный прокси-сервер" as WebProxy
+component "Сервис девайсов" as DeviceService
+
+rectangle "Сервис сценариев" {
+  component "ScenarioController" as Controller
+  component "ScenarioService" as Service
+  component "ScenarioEngine" as Engine
+  component "ScenarioScheduler" as Scheduler
+  component "ScenarioRepository" as Repository
+}
+
+database "БД сценариев" as ScenarioDB
+
+WebProxy --> Controller : REST API
+Controller --> Service : CRUD и ручной запуск
+Service --> Repository : Сохранение сценариев и запусков
+Service --> DeviceService : Проверка команд
+Service --> Engine : Моментальный запуск
+Scheduler --> Engine : Запуск по расписанию
+Engine --> Repository : Получение сценария и фиксация статуса
+Engine --> DeviceService : Выполнение команд
+Repository --> ScenarioDB
+
+@enduml

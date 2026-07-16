@@ -1,154 +1,99 @@
-# Project_template
-
-Это шаблон для решения проектной работы. Структура этого файла повторяет структуру заданий. Заполняйте его по мере работы над решением.
-
-# Задание 1. Анализ и планирование
-
-<aside>
-
-Чтобы составить документ с описанием текущей архитектуры приложения, можно часть информации взять из описания компании и условия задания. Это нормально.
-
-</aside
-
 ### 1. Описание функциональности монолитного приложения
 
 **Управление отоплением:**
 
-- Пользователи могут…
-- Система поддерживает…
-- …
+- Пользователи (IoT) могут создавать, читать, редактировать, удалять информацию о сенсорах
+- Система поддерживает возможность создавать, читать, редактировать, удалять информацию о сенсорах
 
 **Мониторинг температуры:**
 
-- Пользователи могут…
-- Система поддерживает…
-- …
+- Пользователи могут запросить температуру в конкретной локации.
+- Система поддерживает возможность запросить температуру в конкретной локации.
 
 ### 2. Анализ архитектуры монолитного приложения
 
-Перечислите здесь основные особенности текущего приложения: какой язык программирования используется, какая база данных, как организовано взаимодействие между компонентами и так далее.
+- Язык програмирования: GO
+- База данных PostgreSQl
+- В качестве маршрутизатора приложения используется GIN
+- Приложение использует слоистую архитектуру:
+	- handlers
+	- models
+	- services
+	- bd
 
 ### 3. Определение доменов и границы контекстов
 
-Опишите здесь домены, которые вы выделили.
+Домены:
+- Управление сенсорами
+- Температура
 
 ### **4. Проблемы монолитного решения**
 
-- …
-- …
-- …
-
-Если вы считаете, что текущее решение не вызывает проблем, аргументируйте свою позицию.
+- Сложность раздельного развития доменов
+- Повышение связанности модулей, в следствие чего повышение нагрузки при поддержке и развитии
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
-Добавьте сюда диаграмму контекста в модели C4.
+[![C1. Диаграмма контекстов](https://www.plantuml.com/plantuml/png/JKz1IiKm4Dtd54Ft5Ro0VD2DQ_K08N-GGjf2aWhkh6vTkXTl42p5MDkUON8ZPwA216OcxxrvZpdue5qOMgj24op2-Ua9q0ibYZJb1wuhlmYqq4vRVgIPbZnoZqff4te75RqozPMVwOFxEqKHoRy2xU76erCEJT3ThKKMlr4g-_EFxIgsb1ZOEItnF36SH-OthWoAQR6wklS1MsLiFnoXkkolw_maLaNoAPEa5-a5tZK6lL8I3tLzzhVyI_o73jWT-Vnl)](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/schemas/current/c1.puml)
 
-Чтобы добавить ссылку в файл Readme.md, нужно использовать синтаксис Markdown. Это делают так:
-
-```markdown
-[Текст ссылки](URL)
-```
-
-Замените `Текст ссылки` текстом, который хотите использовать для ссылки. Вместо `URL` вставьте адрес, на который должна вести ссылка. Например:
-
-```markdown
-[Посетите Яндекс](https://ya.ru/)
-```
 
 # Задание 2. Проектирование микросервисной архитектуры
 
-В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
-
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+[![C2. Диаграмма контейнеров](https://www.plantuml.com/plantuml/png/XLH1QzHG4Bw_Np7alXuyUf2gLIg8h6R5Sve-PA5D97cAHOHkfNfG4A5dY_yWhbtCRfFqBtpl7pap8HZJq5BocfdvvfjlvarsAtTHvjuSx1itT_kM7jo-HJX5YGA__H6V5VyLX0qQrFuOAwnHOyMX1ajZejYb6GKuO_F2VyKVSQCGeDW1HJczo6rcJ6PZ5oMlk4I0doZzGZ3AxJ_YKaijSS6kceFVn5bnmI-e2ETesE0deFU6A4uFNgU9JHm5Zx8qSLf4tpZOB_C3l_oHY56YDMcP1Xk_G3dXGxfOogaCB-tkD4lV7VOhg5Q5YM9HifBsiEPiRbJpjktRUMn3cyc_wvBRdXjsbFup1nROyDk9i1QeHQC_KSQTUSvJFRoPaWa_wSGA8HLjcX_6DecoUVgFO2zoqMwKor2-u_IwFhRlZy1xob7s9OwXRn35AH-CaPsWoUHkUszqXtPcisber59_TniSUlumdD6zwMFJ-GGm67i_r8aRZGrdCx2lKhC0dBNhhfFVe22KX2MlrALiFMhfLZfjlv9AR_FS_CSoeak9bN8b6y0hKL3xtV1JSU2udVS8KNTLJF4q3PyzCGFcNh4UQApLpgSm0MtPP4z-3Vu2)](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/schemas/next/c2.puml)
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+[![C3. Диаграмма компонентов](https://www.plantuml.com/plantuml/png/VLJDRXCn4BxxAKQzXmit3gYGzC2jIa2Sjnkhh9JkLXiNKI6aRFZX00A18d51LBp14bgnJKdo2kDNu4duF8s95naKoHdRttpVUEPBTiScASt9qKYPp8mqTM_U89vnmpL_jnEiF_6fYHUyGh36kkGBNjefeZdzcio8l_85a7DkR4Msig_SFTSuQX3DbIfrQfBy4EGx_8M_ELQaB-qRlYHUOxlYXQsuwM0H9hVkK3AcX_fWlooUdAgqE3ekSfqRK8HoVEuaKEKbSb6GPFNquopL0rswhvRy_qj5zbD556WDKfqdPLPqYzoKnMYaIn7ORkFmZRHWDt4Sk9SVPlarxZhy1r_wI0zFlFgVNHpSryV5E3D5UIhexLOzKsgOcEGW6RjMVE1Pj0N8yLIzkqhv4L2dSpjuEDsY_jxWFjtPlwU2Ku3yYu7ezX_qY1ko4_lSleRCoaty1zUyna752-Mno0igHIecjR8lnO3YDrTTf5omjmYT1qBIjXSSxvduJIm6k3Uso9otCcKWal9P469wuAxiM-_TralyLFvA_hJ5aFlvaDY_GWWFYcnZtod1nzfm1kqhwLwy2VQzDFW5hXQE3tSuSw0fDbCHhZrzj24VyPQrKmaQtMfAK108MkROrVdG_NNy1W00)](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/schemas/next/c3.puml)
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+[![C4. Диаграмма кода](https://www.plantuml.com/plantuml/png/VLDHZjCm4FtFAKRzwWAfXCHNXAg5xKyG0eco1x3YsMB9iOFjHaI0j7i7Bi0DgeML2a9m1UT6Z3VPjL8NLAcUcVSoyzx4ERME6RUjPUQ4amXdJnRWl_Yzt_bl_INz_wBV3lnF_zj_fs3k_r1vJyMR_h80_pMS_jhl-oiWmWs5E_-ZloBwzKcMLP9P2ojiHOLdMZcZfKG37pE0Xr9ODo1sVbB0IqgV3ldgxUjbO6nm9Cm59yOz63236te0pKWm-7wBrXsoy0DMMqUZwvefJcqUGMIsMl3iyrJa6aquRXNc1XjjXTEckslxvhxoVmV_bdz4Exyz9eoMIS5P53vGIf9V3PKx-Qd7b1gT2aLJBrY5YPtXbLm8nPz9cPePeETToG-zMDQc3k9I3yQKTICZ5ZSjU07dv-Kgn8hLMC3Q6Q4s8NTTCyajEaUXBU25rUgLvXYgeraxAX-tiKBIBPpGQXb59LZGaCvjcA6AGsFNrJkiMPmNMYLtEi-NqpkKJRA0fvVes7vWiVYKKeztYsDWzdW63_8SPkIjcwKcirDKF7peVm40)](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/schemas/next/c4.puml)
 
 # Задание 3. Разработка ER-диаграммы
+[![ER. Сервис сценариев](https://www.plantuml.com/plantuml/png/fLDHQkf05FtFAWO_XRW04L7YF0ZlgG_rFVedOt9hfoGpOUQcQBNGHNGXGd_wqKMaE-fDj2In0McBOCAvvoRdd9mPM1G6qpXoK684ZCywsLFsaXsovxT7-d-bty5nGD5uoreZ_j_t-Bp5X6KXtCa0BDivZBMP35cNfIbTUhs_l_jz0bstc2WH0yqi6gdM1OBRv0onW4Ztbj1RgzMg00CTnqA59VXG2fbxV3AS-TEZ51k04aRgxuYXpLK4-S9AwmY48jG6Dn2cX2u5qW1b39HJdE1zauQbDnsFXvDHNSlo9F-YfdAZIlbrfBHFCTTci44mIaJCm3KOK04Gjv9OtM0Y39ccZNgwYROIfLO4IeMm1jFeZLznxz_2dqxEtC46WZJV_wa_2XPJMvTSbB8fVPPRJ2B02vzcmV_mCL_C_5DN4IA8WLvmkQzV2jn0e4tOh9IU951KorlMTBzttVtkSrVEA7hN5BZpSV8wdPgnRYczGcaeP9Ku01Ncn_yT)](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/schemas/next/er.puml)
 
-Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
 
 # Задание 4. Создание и документирование API
 
 ### 1. Тип API
 
-Укажите, какой тип API вы будете использовать для взаимодействия микросервисов. Объясните своё решение.
+В качестве типа API для первичной реализации я бы выбрал REST API, из-за его простоты и легкости интеграции, поддержки.
+Как вариант для будущего апдейта, можно рассматривать AsyncAPI, интегрировав RabbitMQ/Kafka и переведя систему в Event driven design.
 
 ### 2. Документация API
+[OpenAPI-спецификация](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/open-api.yml)
 
-Здесь приложите ссылки на документацию API для микросервисов, которые вы спроектировали в первой части проектной работы. Для документирования используйте Swagger/OpenAPI или AsyncAPI.
+| Метод | Эндпоинт | Описание |
+|---|---|---|
+| `GET` | `/devices` | Возвращает список зарегистрированных девайсов, их настройки и поддерживаемые команды. |
+| `POST` | `/devices` | Регистрирует новый девайс вместе с его настройками и доступными командами. |
+| `GET` | `/devices/{deviceId}` | Возвращает конкретный девайс по UUID. |
+| `GET` | `/scenarios` | Возвращает список созданных сценариев с командами и расписанием. |
+| `POST` | `/scenarios` | Создаёт сценарий из упорядоченного набора команд для девайсов. |
+| `GET` | `/scenarios/{scenarioId}` | Возвращает конкретный сценарий по UUID. |
+| `PUT` | `/scenarios/{scenarioId}` | Полностью заменяет настройки, расписание и команды сценария. |
+| `DELETE` | `/scenarios/{scenarioId}` | Удаляет сценарий. |
+| `POST` | `/scenarios/{scenarioId}/executions` | Запускает сценарий немедленно и возвращает информацию о запуске. |
+| `GET` | `/scenario-executions/{executionId}` | Возвращает состояние запуска: `pending`, `running`, `succeeded` или `failed`. |
 
 # Задание 5. Работа с docker и docker-compose
 
-Перейдите в apps.
-
-Там находится приложение-монолит для работы с датчиками температуры. В README.md описано как запустить решение.
-
-Вам нужно:
-
-1) сделать простое приложение temperature-api на любом удобном для вас языке программирования, которое при запросе /temperature?location= будет отдавать рандомное значение температуры.
-
-Locations - название комнаты, sensorId - идентификатор названия комнаты
+[smart_home/Dockerfile](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/apps/smart_home/Dockerfile)  
+[temperature/Dockerfile](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/apps/temperature/Dockerfile)  
+[apps/docker-compose](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/apps/docker-compose.yml)  
 
 ```
-	// If no location is provided, use a default based on sensor ID
-	if location == "" {
-		switch sensorID {
-		case "1":
-			location = "Living Room"
-		case "2":
-			location = "Bedroom"
-		case "3":
-			location = "Kitchen"
-		default:
-			location = "Unknown"
-		}
-	}
-
-	// If no sensor ID is provided, generate one based on location
-	if sensorID == "" {
-		switch location {
-		case "Living Room":
-			sensorID = "1"
-		case "Bedroom":
-			sensorID = "2"
-		case "Kitchen":
-			sensorID = "3"
-		default:
-			sensorID = "0"
-		}
-	}
+cd apps
+docker compose up --build -d
 ```
-
-2) Приложение следует упаковать в Docker и добавить в docker-compose. Порт по умолчанию должен быть 8081
-
-3) Кроме того для smart_home приложения требуется база данных - добавьте в docker-compose файл настройки для запуска postgres с указанием скрипта инициализации ./smart_home/init.sql
-
-Для проверки можно использовать Postman коллекцию smarthome-api.postman_collection.json и вызвать:
-
-- Create Sensor
-- Get All Sensors
-
-Должно при каждом вызове отображаться разное значение температуры
-
-Ревьюер будет проверять точно так же.
-
 
 # **Задание 6. Разработка MVP**
 
-Необходимо создать новые микросервисы и обеспечить их интеграции с существующим монолитом для плавного перехода к микросервисной архитектуре. 
+[apps/device_service](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/apps/device_service)  
 
-### **Что нужно сделать**
+[apps/history_service](https://github.com/ilya-pelikh/architecture-pro-warmhouse/blob/warmhouse/apps/history_service)  
 
-1. Создайте новые микросервисы для управления телеметрией и устройствами (с простейшей логикой), которые будут интегрированы с существующим монолитным приложением. Каждый микросервис на своем ООП языке.
-2. Обеспечьте взаимодействие между микросервисами и монолитом (при желании с помощью брокера сообщений), чтобы постепенно перенести функциональность из монолита в микросервисы. 
-
-В результате у вас должны быть созданы Dockerfiles и docker-compose для запуска микросервисов. 
+NOTE: не стал разрабатывать сервис сценариев, тк на мой взгляд он не является необходимым для MVP
+Логику взаимодействия новой архитектуры можно увидеть в С3 диаграмме

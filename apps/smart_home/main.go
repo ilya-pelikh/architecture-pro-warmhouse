@@ -49,6 +49,16 @@ func main() {
 	sensorHandler := handlers.NewSensorHandler(database, temperatureService)
 	sensorHandler.RegisterRoutes(apiRoutes)
 
+	// Strangler pattern: the monolith remains the public API entry point.
+	migrationHandler, err := handlers.NewMigrationHandler(
+		getEnv("DEVICE_SERVICE_URL", "http://localhost:8082"),
+		getEnv("HISTORY_SERVICE_URL", "http://localhost:8083"),
+	)
+	if err != nil {
+		log.Fatalf("Unable to configure microservice proxies: %v\n", err)
+	}
+	migrationHandler.RegisterRoutes(router.Group("/api"))
+
 	// Start server
 	srv := &http.Server{
 		Addr:    getEnv("PORT", ":8080"),

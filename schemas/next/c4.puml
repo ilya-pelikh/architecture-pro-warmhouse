@@ -1,0 +1,46 @@
+@startuml
+title C4. Диаграмма кода (пример: Сервис девайсов)
+
+class DeviceController {
+  +listDevices(): List<DeviceDTO>
+  +getDevice(id): DeviceDTO
+  +registerDevice(request): DeviceDTO
+  +executeCommand(id, request): void
+}
+
+class DeviceService {
+  -repository: DeviceRepository
+  +listDevices(): List<Device>
+  +getDevice(id): Device
+  +registerDevice(device): Device
+  +validateCommand(deviceId, command): void
+  +executeCommand(deviceId, command): void
+}
+
+interface DeviceRepository {
+  +findAll(): List<Device>
+  +findById(id): Device
+  +save(device): Device
+}
+
+class DeviceRepositoryImpl
+
+class Device {
+  -id: UUID
+  -name: String
+  -type: String
+  -settings: JsonNode
+  -commands: List<CommandDefinition>
+}
+
+class CommandDefinition {
+  -name: String
+  -parametersSchema: JsonNode
+}
+
+DeviceController --> DeviceService
+DeviceService --> DeviceRepository
+DeviceRepositoryImpl ..|> DeviceRepository
+DeviceService --> Device
+Device "1" *-- "many" CommandDefinition
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+title ER.Диаграмма
+
+entity "DEVICES" as devices {
+  * id : uuid <<PK>>
+  --
+  * name : string
+  * type : string
+  * settings : jsonb
+  * commands : jsonb
+}
+
+entity "SCENARIOS" as scenarios {
+  * id : uuid <<PK>>
+  --
+  * name : string
+  * enabled : boolean
+  scheduled_at : timestamptz
+}
+
+entity "SCENARIO_COMMANDS" as scenario_commands {
+  * id : uuid <<PK>>
+  --
+  * scenario_id : uuid <<FK>>
+  * device_id : uuid <<external reference>>
+  * command : string
+  * parameters : jsonb
+  * position : integer
+}
+
+entity "SCENARIO_EXECUTIONS" as scenario_executions {
+  * id : uuid <<PK>>
+  --
+  * scenario_id : uuid <<FK>>
+  * status : string
+  * started_at : timestamptz
+  completed_at : timestamptz
+}
+
+entity "TELEMETRIES" as telemetries {
+  * id : uuid <<PK>>
+  --
+  * device_id : uuid <<external reference>>
+  * recorded_at : timestamptz
+  * data : jsonb
+}
+
+scenarios ||--|{ scenario_commands
+scenarios ||--o{ scenario_executions
+devices .. telemetries : device_id
+devices .. scenario_commands : device_id
+@enduml
