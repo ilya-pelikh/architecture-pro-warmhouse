@@ -1,0 +1,10 @@
+@startuml
+title C1. Диаграмма контекста
+
+actor "Пользователь" as User
+rectangle "Система мониторинга сенсоров" as System
+cloud "IoT-устройства" as Devices
+
+User --> System
+Devices --> System
+@enduml

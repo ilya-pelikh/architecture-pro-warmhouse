@@ -1,13 +1,107 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: smarthome-postgres
-  ## тут нужно добавить настройки
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./smart_home/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U postgres -d smarthome -c 'SELECT 1 FROM sensors LIMIT 1' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - smarthome-network
 
   temperature-api:
-  ## тут нужно добавить приложение
+    build:
+      context: ./temperature
+      dockerfile: Dockerfile
+    container_name: temperature-api
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
+  device-db:
+    image: mongo:7
+    container_name: device-db
+    volumes:
+      - device_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
+  history-db:
+    image: mongo:7
+    container_name: history-db
+    volumes:
+      - history_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
+  history-service:
+    build:
+      context: ./history_service
+      dockerfile: Dockerfile
+    container_name: history-service
+    depends_on:
+      history-db:
+        condition: service_healthy
+    environment:
+      MONGO_URL: mongodb://history-db:27017
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8083/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
+  device-service:
+    build:
+      context: ./device_service
+      dockerfile: Dockerfile
+    container_name: device-service
+    depends_on:
+      device-db:
+        condition: service_healthy
+      history-service:
+        condition: service_healthy
+    environment:
+      MONGO_URL: mongodb://device-db:27017
+      HISTORY_SERVICE_URL: http://history-service:8083
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8082/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - smarthome-network
 
   app:
     build:
@@ -19,9 +113,15 @@ services:
         condition: service_healthy
       temperature-api:
         condition: service_started
+      device-service:
+        condition: service_healthy
+      history-service:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/smarthome
       - TEMPERATURE_API_URL=http://temperature-api:8081
+      - DEVICE_SERVICE_URL=http://device-service:8082
+      - HISTORY_SERVICE_URL=http://history-service:8083
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -30,6 +130,8 @@ services:
 
 volumes:
   postgres_data:
+  device_data:
+  history_data:
 
 networks:
   smarthome-network:

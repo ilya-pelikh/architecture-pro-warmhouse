@@ -1,0 +1,27 @@
+@startuml
+title C2. Диаграмма контейнеров
+
+actor "Пользователь" as User
+
+rectangle "Система управления умным домом" {
+  component "Front" as Front
+  rectangle "Обратный прокси-сервер" as WebProxy
+  component "Сервис девайсов" as DeviceService
+  component "Сервис исторических данных" as HistoryService
+  component "Сервис сценариев" as ScenarioService
+  database "БД девайсов" as DeviceDB
+  database "БД истории" as HistoryDB
+  database "БД сценариев" as ScenarioDB
+}
+
+User --> Front : HTTPS
+Front --> WebProxy : REST API
+WebProxy --> DeviceService
+WebProxy --> HistoryService
+WebProxy --> ScenarioService
+ScenarioService --> DeviceService : Проверка и выполнение команд
+DeviceService --> HistoryService : Передача телеметрии
+DeviceService --> DeviceDB : NoSQL
+HistoryService --> HistoryDB : NoSQL
+ScenarioService --> ScenarioDB : SQL
+@enduml
